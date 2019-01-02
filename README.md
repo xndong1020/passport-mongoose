@@ -123,19 +123,25 @@ module.exports = mongoose;
 
 ```
 const mongoose = require("mongoose");
+const { emailValidator } = require("./validators");
 
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: True
+    required: true
   },
   email: {
     type: String,
-    required: True
+    required: [true, "User email required"],
+    validate: {
+      validator: emailValidator,
+      message: props => `${props.value} is not a valid email address!`
+    }
   },
   password: {
     type: String,
-    required: True
+    min: [6, "Password should be at lease 6 digits long"],
+    required: true
   },
   data: {
     type: Date,
@@ -146,6 +152,18 @@ const UserSchema = new mongoose.Schema({
 const User = mongoose.model("User", UserSchema);
 
 module.exports = User;
+
+```
+`models/validators/index.js`
+```
+const emailValidator = value => {
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(value);
+};
+
+module.exports = {
+  emailValidator
+};
 
 ```
 
